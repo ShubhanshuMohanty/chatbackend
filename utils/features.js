@@ -28,4 +28,11 @@ const sendToken = (res, user, code, message) => {
     message,
   });
 };
-export { connectDB, sendToken ,cookieOptions};
+
+const emitEvent = (req, event, users, data) => {
+  // const io = req.app.get("io");
+  // const usersSocket = getSockets(users);
+  // io.to(usersSocket).emit(event, data);
+  console.log("emmiting event", event);
+};
+export { connectDB, sendToken, cookieOptions, emitEvent };
