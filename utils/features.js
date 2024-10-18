@@ -35,4 +35,8 @@ const emitEvent = (req, event, users, data) => {
   // io.to(usersSocket).emit(event, data);
   console.log("emmiting event", event);
 };
-export { connectDB, sendToken, cookieOptions, emitEvent };
+
+const deletFilesFromCloudinary=async(public_ids)=>{
+
+}
+export { connectDB, sendToken, cookieOptions, emitEvent ,deletFilesFromCloudinary};
