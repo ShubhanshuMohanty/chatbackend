@@ -1,5 +1,6 @@
 import express from "express";
 import {
+    acceptFriendRequest,
   getMyProfile,
   login,
   logout,
@@ -10,6 +11,7 @@ import {
 import { multerUpload, singleAvatar } from "../middlewares/multer.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 import {
+    acceptRequestValidator,
   loginValidator,
   registerValidator,
   sendRequestValidator,
@@ -33,4 +35,10 @@ app.put(
   sendFriendRequest
 );
 
+app.put(
+    "/acceptrequest",
+    acceptRequestValidator(),
+    validateHandler,
+    acceptFriendRequest
+  );
 export default app;
