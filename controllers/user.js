@@ -1,10 +1,13 @@
 import { compare } from "bcrypt";
 import { User } from "../models/user.js";
+import {Chat} from "../models/chat.js"
 import { Request } from "../models/request.js";
 import { cookieOptions, emitEvent, sendToken } from "../utils/features.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
 import { TryCatch } from "../middlewares/error.js";
 import { ErrorHandler } from "../utils/utility.js";
+
+import { getOtherMember } from "../lib/helper.js";
 
 const newUser = async (req, res) => {
   const { name, username, password, bio } = req.body;
@@ -179,6 +182,44 @@ const getMyNotifications = TryCatch(async (req, res) => {
     allRequests,
   });
 });
+
+const getMyFriends = TryCatch(async (req, res) => {
+  const chatId = req.query.chatId;
+
+  const chats = await Chat.find({
+    members: req.user,
+    groupChat: false,
+  }).populate("members", "name avatar");
+
+  const friends = chats.map(({ members }) => {
+    const otherUser = getOtherMember(members, req.user);
+
+    return {
+      _id: otherUser._id,
+      name: otherUser.name,
+      avatar: otherUser.avatar.url,
+    };
+  });
+
+  if (chatId) {
+    const chat = await Chat.findById(chatId);
+
+    const availableFriends = friends.filter(
+      (friend) => !chat.members.includes(friend._id)
+    );
+
+    return res.status(200).json({
+      success: true,
+      friends: availableFriends,
+    });
+  } else {
+    return res.status(200).json({
+      success: true,
+      friends,
+    });
+  }
+});
+
 export {
   login,
   newUser,
@@ -187,5 +228,6 @@ export {
   searchUser,
   sendFriendRequest,
   acceptFriendRequest,
-  getMyNotifications
+  getMyNotifications,
+  getMyFriends
 };
