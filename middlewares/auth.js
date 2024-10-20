@@ -3,7 +3,6 @@ import { ErrorHandler } from "../utils/utility.js";
 import { TryCatch } from "./error.js";
 import { adminSecretKey } from "../app.js";
 
-
 const isAuthenticated = TryCatch(async (req, res, next) => {
   // console.log("cookies:"+req.cookies["chattu-token"]);
 
