@@ -3,6 +3,8 @@ import { connectDB } from "./utils/features.js";
 import dotenv from "dotenv";
 import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
+import { createServer } from "http";
 
 import UserRoute from "./routes/user.js";
 import ChatRoute from "./routes/chat.js";
@@ -28,7 +30,8 @@ connectDB(mongoURI);
 
 const PORT = process.env.PORT || 3000;
 const app = express();
-
+const server = createServer(app);
+const io=new Server(server,{});
 //using middleware
 
 app.use(express.json());
@@ -39,13 +42,23 @@ app.use("/user", UserRoute);
 app.use("/chat", ChatRoute);
 app.use("/admin", AdminRoute);
 
+io.on("connection",(socket)=>{
+
+  console.log("user connected",socket.id);
+  
+
+  socket.on("disconnect",()=>{
+    console.log("User disconnected");
+  })
+})
+
 app.use(errorMiddleware);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("Server is running on port 3000");
 });
 
