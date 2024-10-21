@@ -19,6 +19,7 @@ dotenv.config({
 });
 const mongoURI = process.env.MONGO_URI;
 const adminSecretKey = process.env.ADMIN_SECRET_KEY || "adsasdsdfsdfsdfd";
+const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
 connectDB(mongoURI);
 // createUser(10);
 // createSingleChats(20);
@@ -48,4 +49,4 @@ app.listen(PORT, () => {
   console.log("Server is running on port 3000");
 });
 
-export { adminSecretKey };
+export { adminSecretKey,envMode };

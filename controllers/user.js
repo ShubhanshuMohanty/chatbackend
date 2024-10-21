@@ -9,10 +9,13 @@ import { ErrorHandler } from "../utils/utility.js";
 
 import { getOtherMember } from "../lib/helper.js";
 
-const newUser = async (req, res) => {
+const newUser = TryCatch(async (req, res) => {
   const { name, username, password, bio } = req.body;
 
   // console.log(req.body);
+  const file = req.file;
+
+  if (!file) return next(new ErrorHandler("Please Upload Avatar"));
 
   const avatar = {
     public_id: "sdfsd",
@@ -29,7 +32,7 @@ const newUser = async (req, res) => {
 
   sendToken(res, user, 201, "user created");
   res.status(201).json({ message: "User created successfully " + user });
-};
+});
 
 const login = TryCatch(async (req, res, next) => {
   const { username, password } = req.body;
