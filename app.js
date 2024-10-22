@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { v4 as uuid } from "uuid";
+import cors from "cors";
 
 import UserRoute from "./routes/user.js";
 import ChatRoute from "./routes/chat.js";
@@ -18,6 +19,7 @@ import {
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT, ONLINE_USERS } from "./constants/events.js";
 import { Message } from "./models/message.js";
 import { getSockets } from "./lib/helper.js";
+import { corsOptions } from "./constants/config.js";
 // import { createUser } from "./seeders/user.js";
 
 dotenv.config({
@@ -38,16 +40,19 @@ connectDB(mongoURI);
 const PORT = process.env.PORT || 3000;
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, {
+  cors: corsOptions,
+});
 //using middleware
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors(corsOptions))
 // app.use(express.urlencoded({ extended: true }));
 
-app.use("/user", UserRoute);
-app.use("/chat", ChatRoute);
-app.use("/admin", AdminRoute);
+app.use("/api/v1/user", UserRoute);
+app.use("/api/v1/chat", ChatRoute);
+app.use("/api/v1/admin", AdminRoute);
 
 io.on("connection", (socket) => {
   const user = {
