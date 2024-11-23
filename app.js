@@ -22,6 +22,7 @@ import { Message } from "./models/message.js";
 import { getSockets } from "./lib/helper.js";
 import { corsOptions } from "./constants/config.js";
 // import { createUser } from "./seeders/user.js";
+import { socketAuthenticator } from "./middlewares/auth.js";
 
 dotenv.config({
   path: "./.env",
@@ -61,13 +62,19 @@ app.use("/api/v1/user", UserRoute);
 app.use("/api/v1/chat", ChatRoute);
 app.use("/api/v1/admin", AdminRoute);
 
+io.use((socket, next) => {
+  cookieParser()(
+    socket.request,
+    socket.request.res,
+    async (err) => await socketAuthenticator(err, socket, next)
+  );
+});
 io.on("connection", (socket) => {
-  const user = {
-    _id: "assdf",
-    name: "aam admi",
-  };
+  const user=socket.user;
+  // console.log("sm user",user);
+  
   userSocketIDs.set(user._id.toString(), socket.id);
-  console.log("user connected", userSocketIDs);
+  // console.log("user connected", userSocketIDs);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
@@ -80,7 +87,8 @@ io.on("connection", (socket) => {
       chat: chatId,
       createdAt: new Date().toISOString(),
     };
-
+    console.log("message=",message);
+    
     const messageForDB = {
       content: message,
       sender: user._id,
@@ -94,11 +102,11 @@ io.on("connection", (socket) => {
     });
     io.to(membersSocket).emit(NEW_MESSAGE_ALERT, { chatId });
 
-    /*try {
+    try {
       await Message.create(messageForDB);
     } catch (error) {
       throw new Error(error);
-    }*/
+    }
   });
 
   socket.on("disconnect", () => {
