@@ -51,6 +51,7 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: corsOptions,
 });
+app.set("io", io);
 //using middleware
 
 app.use(express.json());
